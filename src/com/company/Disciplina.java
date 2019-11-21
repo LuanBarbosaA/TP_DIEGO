@@ -19,7 +19,7 @@ public class Disciplina {
     }
 
     public void setCodigoDisciplina(int codigoDisciplina) {
-        codigoDisciplina = codigoDisciplina;
+        this.codigoDisciplina = codigoDisciplina;
     }
 
     public String getNome() {
@@ -35,6 +35,6 @@ public class Disciplina {
     }
 
     public void setCargaHorariaGeral(int cargaHorariaGeral) {
-        cargaHorariaGeral = cargaHorariaGeral;
+        this.cargaHorariaGeral = cargaHorariaGeral;
     }
 }

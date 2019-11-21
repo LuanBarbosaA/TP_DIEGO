@@ -88,7 +88,8 @@ public class Main {
         String sobrenome = JOptionPane.showInputDialog(null, "Sobrenome: ");
         String sexo = JOptionPane.showInputDialog(null, "Sexo: ");
         Calendar nascimento = getNascimento();
-        Aluno aluno = new Aluno(nome, sobrenome, sexo, nascimento);
+        Aluno aluno = new Aluno(nome, sobrenome, sexo);
+        aluno.setNascimento(nascimento);
         AlunoDal alunoDal = new AlunoDal();
         alunoDal.saveAluno(aluno);
     }
@@ -105,8 +106,8 @@ public class Main {
             Aluno aluno = alunoDal.getAluno(codigoAluno);
 
             DisciplinaDal disciplinaDal = new DisciplinaDal();
-            ArrayList<Disciplina> disciplinas = new ArrayList<Disciplina>();
-            disciplinas.add((Disciplina) disciplinaDal.getDisciplina(codigoDsiciplina));
+            ArrayList<Disciplina> disciplinas = new ArrayList<>();
+            disciplinas.add(disciplinaDal.getDisciplina(codigoDsiciplina));
 
             Matricula matricula = new Matricula(anoLetivo, serie, aluno, disciplinas);
             MatriculaDal matriculaDal = new MatriculaDal();
@@ -118,7 +119,7 @@ public class Main {
             Aluno aluno = alunoDal.getAluno(codigoAluno);
 
             DisciplinaPraticaDal disciplinaPraticaDal = new DisciplinaPraticaDal();
-            ArrayList<DisciplinaPratica> disciplinaPraticas = new ArrayList<DisciplinaPratica>();
+            ArrayList<DisciplinaPratica> disciplinaPraticas = new ArrayList<>();
             disciplinaPraticas.add((DisciplinaPratica) disciplinaPraticaDal.getDisciplina(codigoDsiciplina));
 
             Matricula matricula = new Matricula(anoLetivo, serie, aluno, disciplinaPraticas);
@@ -146,22 +147,37 @@ public class Main {
         }
     }
 
+    private static void setILancarNotas(){
+        int codigoAluno = Integer.parseInt(JOptionPane.showInputDialog(null, "Codigo do aluno: "));
+        int codigoDisciplina = Integer.parseInt(JOptionPane.showInputDialog(null, "Codigo da disciplina: "));
+        short anoLetivo = Short.parseShort(JOptionPane.showInputDialog(null, "Ano letivo: "));
+        byte serie = (byte) Integer.parseInt(JOptionPane.showInputDialog(null, "Serie: "));
+
+        MatriculaDal matriculaDal = new MatriculaDal();
+        int codMatricula = matriculaDal.VerificaMatricula(codigoAluno, codigoDisciplina, anoLetivo, serie);
+        if(codMatricula!=0){
+            int bimestre =  Integer.parseInt(JOptionPane.showInputDialog(null, "Digite o bimestre a lançar nota: "));
+            int nota = Integer.parseInt(JOptionPane.showInputDialog(null, "Digite a nota do bimestre: "));
+            matriculaDal.LancarNotas(codMatricula, bimestre, nota);//Toda vez que inserir uma nota chamar os métodos media e lancar aprovado
+        }else{
+
+        }
+    }
+
     private static void listarAlunos(){
         AlunoDal alunoDal = new AlunoDal();
         ArrayList<Aluno> aluno = alunoDal.getAlunos();
         JTable table = new JTable();
         DefaultTableModel dtm = new DefaultTableModel(0, 0);
-        String header[] = new String[] { "Codigo", "Nome", "Sobrenome", "Sexo", "Nascimento"};
+        String header[] = new String[] { "Codigo", "Nome", "Sobrenome", "Sexo", "Nascimento", "Idade"};
 
         dtm.setColumnIdentifiers(header);
 
         table.setModel(dtm);
 
-        for(int i = 0; i < aluno.size(); i++){
-            for (Aluno alunoTeste : aluno) {
-                dtm.addRow(new Object[] { alunoTeste.getIdAluno(), alunoTeste.getNome(),
-                        alunoTeste.getSobrenome(), alunoTeste.getSexo(), alunoTeste.getNascimento()});
-            }
+        for (Aluno alunoTeste : aluno) {
+            dtm.addRow(new Object[] { alunoTeste.getIdAluno(), alunoTeste.getNome(),
+                    alunoTeste.getSobrenome(), alunoTeste.getSexo(), alunoTeste.getNascimento(), alunoTeste.getIdade()});
         }
         table.setModel(dtm);
         JOptionPane.showMessageDialog(null, new JScrollPane(table));
@@ -172,7 +188,7 @@ public class Main {
         AlunoDal alunoDal = new AlunoDal();
         Aluno aluno = alunoDal.getAluno(codigo);
 
-        String menu = " [------- Aluno -------] ";
+        String menu = "[------- Aluno -------]";
 
         menu += "\nCodigo do Aluno: " + aluno.getIdAluno();
         menu += "\nNome do Aluno: " + aluno.getNome();

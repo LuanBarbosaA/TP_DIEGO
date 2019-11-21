@@ -49,6 +49,7 @@ public class AlunoDal {
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(rs.getDate("Nascimento"));
                 aluno.setNascimento(calendar);
+                aluno.setIdade(rs.getInt("Idade"));
             }
             return aluno;
         } catch (SQLException e) {
@@ -64,20 +65,21 @@ public class AlunoDal {
         try {
             stmt = con.prepareStatement(getAluno);
             ResultSet rs = stmt.executeQuery(getAluno);
-            List<Aluno> aluno = new ArrayList<Aluno>();
+            List<Aluno> alunos = new ArrayList<>();
             while (rs.next())
             {
-                Aluno alunos = new Aluno();
-                alunos.setIdAluno(rs.getInt("idAluno"));
-                alunos.setNome(rs.getString("Nome"));
-                alunos.setSobrenome(rs.getString("Sobrenome"));
-                alunos.setSexo(rs.getString("Sexo").charAt(0));
+                Aluno aluno = new Aluno();
+                aluno.setIdAluno(rs.getInt("idAluno"));
+                aluno.setNome(rs.getString("Nome"));
+                aluno.setSobrenome(rs.getString("Sobrenome"));
+                aluno.setSexo(rs.getString("Sexo").charAt(0));
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(rs.getDate("Nascimento"));
-                alunos.setNascimento(calendar);
-                aluno.add(alunos);
+                aluno.setNascimento(calendar);
+                aluno.setIdade(rs.getInt("Idade"));
+                alunos.add(aluno);
             }
-            return (ArrayList<Aluno>) aluno;
+            return (ArrayList<Aluno>) alunos;
         } catch (SQLException e) {
             e.printStackTrace();
             return null;

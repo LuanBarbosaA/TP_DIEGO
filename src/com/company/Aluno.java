@@ -15,11 +15,10 @@ public class Aluno {
     public Aluno(){
     }
 
-    public Aluno(String nome, String sobrenome, String sexo, Calendar nascimento){
+    public Aluno(String nome, String sobrenome, String sexo){
         this.nome = nome;
         this.sobrenome = sobrenome;
         this.sexo = sexo.charAt(0);
-        this.nascimento = nascimento;
     }
 
     private int calculaIdade(){
@@ -78,6 +77,7 @@ public class Aluno {
 
     public void setNascimento(Calendar nascimento) {
         this.nascimento = nascimento;
+        setIdade();
     }
 
     public int getIdade() {
@@ -86,5 +86,9 @@ public class Aluno {
 
     public void setIdade() {
         this.idade = calculaIdade();
+    }
+
+    public void setIdade(int idade) {
+        this.idade = idade;
     }
 }
