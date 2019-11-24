@@ -21,7 +21,9 @@ public class Main {
     private static final int inserirDisciplina = 3;
     private static final int listarAlunos = 4;
     private static final int listarAluno = 5;
-    private static final int sairSistema = 6;
+    private static final int lancarNota = 6;
+    private static final int boletim = 7;
+    private static final int sairSistema = 8;
 
     public static void main(String[] args) throws ParseException {
         Integer option = readOption();
@@ -50,13 +52,21 @@ public class Main {
                     listarAluno();
                     break;
 
+                case lancarNota:
+                    setLancarNotas();
+                    break;
+
+                case boletim:
+                    mostrarBoletim();
+                    break;
+
                 case sairSistema:
                     JOptionPane.showMessageDialog(null, "Leaving the program...");
                     break;
 
                 default:
                     JOptionPane.showMessageDialog(null,
-                            "Invalid Option. Type numbers only between 1 and 6 :)");
+                            "Invalid Option. Type numbers only between 1 and 7 :)");
 
             }
 
@@ -75,7 +85,9 @@ public class Main {
         menu += "\n[3] - Cadastrar disciplina";
         menu += "\n[4] - Listar todos alunos";
         menu += "\n[5] - Listar aluno por codigo";
-        menu += "\n[6] - Exit";
+        menu += "\n[6] - Lançar nota";
+        menu += "\n[7] - Boletim";
+        menu += "\n[8] - Exit";
 
         String startOption = JOptionPane.showInputDialog(null, menu);
 
@@ -126,7 +138,6 @@ public class Main {
             MatriculaDal matriculaDal = new MatriculaDal();
             matriculaDal.saveMatricula(matricula, true);
         }
-
     }
 
     private static void setInserirDisciplina(){
@@ -147,20 +158,53 @@ public class Main {
         }
     }
 
-    private static void setILancarNotas(){
+    private static void setLancarNotas(){
         int codigoAluno = Integer.parseInt(JOptionPane.showInputDialog(null, "Codigo do aluno: "));
         int codigoDisciplina = Integer.parseInt(JOptionPane.showInputDialog(null, "Codigo da disciplina: "));
         short anoLetivo = Short.parseShort(JOptionPane.showInputDialog(null, "Ano letivo: "));
         byte serie = (byte) Integer.parseInt(JOptionPane.showInputDialog(null, "Serie: "));
 
         MatriculaDal matriculaDal = new MatriculaDal();
-        int codMatricula = matriculaDal.VerificaMatricula(codigoAluno, codigoDisciplina, anoLetivo, serie);
-        if(codMatricula!=0){
+        Matricula matricula = matriculaDal.VerificaMatricula(codigoAluno, codigoDisciplina, anoLetivo, serie);
+        if(matricula.getCod()!=0){
             int bimestre =  Integer.parseInt(JOptionPane.showInputDialog(null, "Digite o bimestre a lançar nota: "));
-            int nota = Integer.parseInt(JOptionPane.showInputDialog(null, "Digite a nota do bimestre: "));
-            matriculaDal.LancarNotas(codMatricula, bimestre, nota);//Toda vez que inserir uma nota chamar os métodos media e lancar aprovado
+            float nota = Float.parseFloat(JOptionPane.showInputDialog(null, "Digite a nota do bimestre: "));
+            int[] pesos = new int[4];
+            String aprovado = "Reprovado";
+            pesos[0] = 2;
+            float[] notas = {matricula.getNotaPrimeiroBimestre(), matricula.getNotaSegundoBimestre(),
+                    matricula.getNotaTerceiroBimestre(), matricula.getNotaQuartoBimestre()};
+            switch(bimestre){
+                case 1:
+                    matricula.setNotaPrimeiroBimestre(nota);
+                    matricula.Media(notas);
+                    aprovado = matricula.getAprovado();
+                    break;
+                case 2:
+                    matricula.setNotaSegundoBimestre(nota);
+                    matricula.MediaPonderada(notas, pesos);
+                    aprovado = matricula.getAprovado();
+                    break;
+                case 3:
+                    matricula.setNotaTerceiroBimestre(nota);
+                    matricula.Media(notas);
+                    aprovado = matricula.getAprovado();
+                    break;
+                case 4:
+                    matricula.setNotaQuartoBimestre(nota);
+                    matricula.MediaPonderada(notas, pesos);
+                    aprovado = matricula.getAprovado();
+                    break;
+                default:
+                    JOptionPane.showMessageDialog(null, "Opção inválida!");
+            }
+            if(aprovado=="Aprovado"){
+                matriculaDal.LancarNotas(matricula.getCod(), bimestre, nota, matricula.getMedia(), "Aprovado");
+            }else{
+                matriculaDal.LancarNotas(matricula.getCod(), bimestre, nota, matricula.getMedia(), "Reprovado");
+            }
         }else{
-
+            JOptionPane.showMessageDialog(null, "Matrícula inválida!", "Erro", JOptionPane.WARNING_MESSAGE);
         }
     }
 
@@ -199,7 +243,6 @@ public class Main {
         JOptionPane.showMessageDialog(null, menu);
     }
 
-
     private static Calendar getNascimento() throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String nascimento = JOptionPane.showInputDialog(null, "Data de nascimento: ");
@@ -208,4 +251,30 @@ public class Main {
         return c;
     }
 
+    private static void mostrarBoletim(){
+        int codigoAluno = Integer.parseInt(JOptionPane.showInputDialog(null, "Codigo do aluno: "));
+        int ano = Integer.parseInt(JOptionPane.showInputDialog(null, "Digite o ano letivo: "));
+        MatriculaDal matriculaDal = new MatriculaDal();
+        ArrayList<Matricula> matriculas = matriculaDal.getBoletim(codigoAluno, ano);
+
+        JTable table = new JTable();
+        DefaultTableModel dtm = new DefaultTableModel(0, 0);
+        String header[] = new String[] { "Nome", "CH", "1° Bim.", "2° Bim.", "3° Bim.", "4° Bim.", "Media", "Situação"};
+
+        dtm.setColumnIdentifiers(header);
+
+        table.setModel(dtm);
+
+        for (Matricula matricula : matriculas) {
+            for(Disciplina disciplina : matricula.getDisciplinas()){
+                dtm.addRow(new Object[] { disciplina.getNome(), disciplina.getCargaHorariaGeral(),
+                        matricula.getNotaPrimeiroBimestre(), matricula.getNotaSegundoBimestre(),
+                        matricula.getNotaTerceiroBimestre(), matricula.getNotaQuartoBimestre(),
+                        matricula.getMedia(), matricula.getAprovado()
+                });
+            }
+        }
+        table.setModel(dtm);
+        JOptionPane.showMessageDialog(null, new JScrollPane(table));
+    }
 }

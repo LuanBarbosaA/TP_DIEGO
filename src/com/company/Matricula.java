@@ -5,17 +5,26 @@ import java.util.List;
 
 public class Matricula {
 
+    private int codMatricula;
     private short anoLetivo;
     private byte serie;
     private float notaPrimeiroBimestre = 0.0f;
     private float notaSegundoBimestre = 0.0f;
     private float notaTerceiroBimestre = 0.0f;
     private float notaQuartoBimestre = 0.0f;
-    private boolean aprovado = false;
+    private String aprovado = "Reprovado";
     private float media = 0.0f;
     private Aluno aluno;
     private ArrayList<Disciplina> disciplinas;
     private ArrayList<DisciplinaPratica> disciplinaPraticas;
+
+    public int getCod(){
+        return this.codMatricula;
+    }
+
+    public void setCod(int cod){
+        this.codMatricula = cod;
+    }
 
     public Aluno getAluno() {
         return aluno;
@@ -41,6 +50,9 @@ public class Matricula {
         this.disciplinaPraticas = disciplinaPraticas;
     }
 
+    public Matricula() {
+    }
+
     public Matricula(short anoLetivo, byte serie, Aluno aluno, List<Disciplina> disciplinas) {
         this.aluno = aluno;
         this.disciplinas = (ArrayList<Disciplina>) disciplinas;
@@ -50,7 +62,7 @@ public class Matricula {
         this.notaSegundoBimestre = 0.0f;
         this.notaTerceiroBimestre = 0.0f;
         this.notaQuartoBimestre = 0.0f;
-        this.aprovado = false;
+        this.aprovado = "Reprovado";
         this.media = 0.0f;
     }
 
@@ -65,7 +77,7 @@ public class Matricula {
         this.notaSegundoBimestre = 0.0f;
         this.notaTerceiroBimestre = 0.0f;
         this.notaQuartoBimestre = 0.0f;
-        this.aprovado = false;
+        this.aprovado = "Reprovado";
         this.media = 0.0f;
     }
 
@@ -78,7 +90,7 @@ public class Matricula {
         this.notaSegundoBimestre = 0.0f;
         this.notaTerceiroBimestre = 0.0f;
         this.notaQuartoBimestre = 0.0f;
-        this.aprovado = false;
+        this.aprovado = "Reprovado";
         this.media = 0.0f;
     }
 
@@ -130,11 +142,11 @@ public class Matricula {
         this.notaQuartoBimestre = notaQuartoBimestre;
     }
 
-    public boolean isAprovado() {
+    public String getAprovado() {
         return aprovado;
     }
 
-    public void setAprovado(boolean aprovado) {
+    public void setAprovado(String aprovado) {
         this.aprovado = aprovado;
     }
 
@@ -187,6 +199,8 @@ public class Matricula {
         for(int i = 0; i < notas.length; i++){
             resultado += notas[i];
         }
+        setMedia(resultado / notas.length);
+        VerificaNotas();
         return resultado / notas.length;
     }
 
@@ -199,11 +213,13 @@ public class Matricula {
         }
         resultado = resultado / peso;
         setMedia(resultado);
+        VerificaNotas();
         return resultado;
     }
+
     private void VerificaNotas(){
         if(media > 7){
-            setAprovado(true);
+            setAprovado("Aprovado");
         }
     }
 }
